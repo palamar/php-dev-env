@@ -1,0 +1,4 @@
+[mysqld]
+innodb-buffer-pool-size = 434217728
+default-authentication-plugin=mysql_native_password
+auto_increment_increment=3

@@ -1,0 +1,249 @@
+version: "3.0"
+volumes:
+    mysql-data:
+    esdata:
+    esdata79:
+    code:
+    home:
+    cert:
+    phpstorm-config:
+
+services:
+    nginx.loc:
+        build:
+            context: nginx
+            dockerfile: Dockerfile
+            args:
+                - GUEST_CODE_PATH=${GUEST_CODE_PATH}
+                - USER_ID=${USER_ID}
+                - GROUP_ID=${GROUP_ID}
+        container_name: m2-nginx
+        volumes:
+            - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
+            - ./nginx/cert/:/etc/ssl/cert/
+        depends_on: 
+            - php-fpm7.0.loc
+            - php-fpm7.0-xdebug.loc
+            - php-fpm7.2.loc
+            - php-fpm7.2-xdebug.loc
+            - php-fpm7.4.loc
+            - php-fpm7.4-xdebug.loc
+            - mailhog.loc
+        ports:
+            - "80:80"
+            - "443:443"
+# php 7.0 start
+    php-fpm7.0.loc:
+        build:
+            context: php-fpm7.0
+            dockerfile: Dockerfile
+            args:
+                - GUEST_CODE_PATH=${GUEST_CODE_PATH}
+                - USER_ID=${USER_ID}
+                - GROUP_ID=${GROUP_ID}
+                - HOST_IP=${HOST_IP}
+        container_name: php-fpm7.0
+        volumes:
+            - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
+    php-fpm7.0-xdebug.loc:
+        build:
+            context: php-fpm7.0-xdebug
+            dockerfile: Dockerfile
+            args:
+                - GUEST_CODE_PATH=${GUEST_CODE_PATH}
+                - USER_ID=${USER_ID}
+                - GROUP_ID=${GROUP_ID}
+                - HOST_IP=${HOST_IP}
+                - DEBUG_IP=${DEBUG_IP}
+        container_name: php-fpm7.0-xdebug
+        volumes:
+            - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
+
+    php7.0-env.loc:
+        build:
+            context: php7.0-env
+            dockerfile: Dockerfile
+            args:
+                - GUEST_CODE_PATH=${GUEST_CODE_PATH}
+                - USER_ID=${USER_ID}
+                - GROUP_ID=${GROUP_ID}
+                - HOST_IP=${HOST_IP}
+                - DEBUG_IP=${DEBUG_IP}
+        container_name: php7.0-env
+        volumes:
+            - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
+            - /home/mpalamar/:/home/www-data
+# php 7.0 end
+
+# php 7.2 start
+    php-fpm7.2.loc:
+        build:
+            context: php-fpm7.2
+            dockerfile: Dockerfile
+            args:
+                - GUEST_CODE_PATH=${GUEST_CODE_PATH}
+                - USER_ID=${USER_ID}
+                - GROUP_ID=${GROUP_ID}
+                - HOST_IP=${HOST_IP}
+        container_name: php-fpm7.2
+        volumes:
+            - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
+    php-fpm7.2-xdebug.loc:
+        build:
+            context: php-fpm7.2-xdebug
+            dockerfile: Dockerfile
+            args:
+                - GUEST_CODE_PATH=${GUEST_CODE_PATH}
+                - USER_ID=${USER_ID}
+                - GROUP_ID=${GROUP_ID}
+                - HOST_IP=${HOST_IP}
+                - DEBUG_IP=${DEBUG_IP}
+        container_name: php-fpm7.2-xdebug
+        volumes:
+            - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
+
+    php7.2-env.loc:
+        build:
+            context: php7.2-env
+            dockerfile: Dockerfile
+            args:
+                - GUEST_CODE_PATH=${GUEST_CODE_PATH}
+                - USER_ID=${USER_ID}
+                - GROUP_ID=${GROUP_ID}
+                - HOST_IP=${HOST_IP}
+                - DEBUG_IP=${DEBUG_IP}
+        container_name: php7.2-env
+        volumes:
+            - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
+            - /home/mpalamar/:/home/www-data
+# php 7.2 end
+
+# php 7.4 start
+    php-fpm7.4.loc:
+        build:
+            context: php-fpm7.4
+            dockerfile: Dockerfile
+            args:
+                - GUEST_CODE_PATH=${GUEST_CODE_PATH}
+                - USER_ID=${USER_ID}
+                - GROUP_ID=${GROUP_ID}
+                - HOST_IP=${HOST_IP}
+        container_name: php-fpm7.4
+        volumes:
+            - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
+    
+    php-fpm7.4-xdebug.loc:
+        build:
+            context: php-fpm7.4-xdebug
+            dockerfile: Dockerfile
+            args:
+                - GUEST_CODE_PATH=${GUEST_CODE_PATH}
+                - USER_ID=${USER_ID}
+                - GROUP_ID=${GROUP_ID}
+                - HOST_IP=${HOST_IP}
+                - DEBUG_IP=${DEBUG_IP}
+        container_name: php-fpm7.4-debug
+        volumes:
+            - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
+
+    php-env7.4.loc:
+        build:
+            context: php7.4-env
+            dockerfile: Dockerfile
+            args:
+                - GUEST_CODE_PATH=${GUEST_CODE_PATH}
+                - USER_ID=${USER_ID}
+                - GROUP_ID=${GROUP_ID}
+                - HOST_IP=${HOST_IP}
+                - DEBUG_IP=${DEBUG_IP}
+        container_name: php7.4-env
+        volumes:
+            - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
+            - /home/mpalamar/:/home/www-data
+# php 7.4 end
+
+    mysql.loc:
+        build:
+            context: mysql 
+            dockerfile: Dockerfile
+        container_name: m2-mysql
+        command: --default-authentication-plugin=mysql_native_password
+        volumes:
+            - mysql-data:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: 123123q
+            #MYSQL_USER: magento
+            #MYSQL_PASSWORD: magento
+            #MYSQL_DATABASE: magento
+        ports:
+            - "3306:3306"
+
+    redis.loc:
+        build:
+            context: redis 
+            dockerfile: Dockerfile
+        container_name: m2-redis
+
+    mailhog.loc:
+        build:
+            context: mailhog
+            dockerfile: Dockerfile
+        container_name: m2-mailhog
+
+    vscode-php.loc:
+        build:
+            context: vscode-php
+            dockerfile: Dockerfile
+            args:
+                - GUEST_CODE_PATH=${GUEST_CODE_PATH}
+                - USER_ID=${USER_ID}
+                - GROUP_ID=${GROUP_ID}
+                - HOST_IP=${HOST_IP}
+                - DEBUG_IP=${DEBUG_IP}
+        container_name: m2-vscode-php
+        volumes:
+            - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
+
+    elasticsearch79.loc:
+        build:
+            context: elasticsearch7.9
+            dockerfile: Dockerfile
+        container_name: m2-elasticsearch79
+        environment:
+            - cluster.name="docker-cluster"
+            - network.host=0.0.0.0
+            - action.auto_create_index=true
+            - discovery.seed_hosts=elasticsearch79.loc
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+            - discovery.type=single-node
+        volumes:
+            - esdata79:/usr/share/elasticsearch/data        
+        ports:
+            - "9200:9200"
+
+    rabbitmq39.loc:
+        build:
+            context: rabbitmq
+            dockerfile: Dockerfile
+        container_name: m2-rabbitmq39
+        environment:
+            RABBITMQ_DEFAULT_USER: "magento"
+            RABBITMQ_DEFAULT_PASS: "magento"
+
+    phpstorm.loc:
+        build:
+            context: phpstorm
+            dockerfile: Dockerfile
+            args:
+                - GUEST_CODE_PATH=${GUEST_CODE_PATH}
+                - USER_ID=${USER_ID}
+                - GROUP_ID=${GROUP_ID}
+                - HOST_IP=${HOST_IP}
+        container_name: phpstorm
+        volumes:
+            - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
+            - /home/mpalamar/:/home/www-data
+            - phpstorm-config:/var/www
+        environment:
+            DISPLAY: ${HOST_IP}:0.0
+    
