@@ -19,12 +19,20 @@ RUN apt-get update -y && \
     htop \
     openssh-client \
     patch \
-    openjdk-11-jre
+    openjdk-11-jre \
+    gnome-tweaks \
+    xfce4 \
+    chromium-browser \
+    inxi \
+    xfce4-session \
+    xfce4-goodies \
+    xinit
 RUN apt-get install -y dwm
 ENV TZ=Europe/Kiev
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN mkdir -p /opt/phpstorm
 RUN wget -O - https://download-cf.jetbrains.com/webide/PhpStorm-2022.1.tar.gz | tar xzf - --strip-components=1 -C "/opt/phpstorm"
+RUN cd  /opt/phpstorm && wget https://github.com/JetBrains/intellij-community/raw/master/bin/linux/aarch64/fsnotifier && chmod +x ./fsnotifier
 RUN echo "www-data ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 RUN apt install -y libxkbcommon0
 RUN mkdir -p /var/www

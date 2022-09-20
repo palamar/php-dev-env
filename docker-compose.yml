@@ -20,7 +20,8 @@ services:
         container_name: m2-nginx
         volumes:
             - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
-            - ./nginx/cert/:/etc/ssl/cert/
+            - cert:/etc/ssl/cert
+        #command: ls -la /etc/ssl/cert/
         depends_on: 
             - php-fpm7.0.loc
             - php-fpm7.0-xdebug.loc
@@ -72,7 +73,7 @@ services:
         container_name: php7.0-env
         volumes:
             - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
-            - /home/mpalamar/:/home/www-data
+            - ${HOME_PATH}:/home/www-data
 # php 7.0 end
 
 # php 7.2 start
@@ -115,7 +116,7 @@ services:
         container_name: php7.2-env
         volumes:
             - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
-            - /home/mpalamar/:/home/www-data
+            - ${HOME_PATH}:/home/www-data
 # php 7.2 end
 
 # php 7.4 start
@@ -142,7 +143,7 @@ services:
                 - GROUP_ID=${GROUP_ID}
                 - HOST_IP=${HOST_IP}
                 - DEBUG_IP=${DEBUG_IP}
-        container_name: php-fpm7.4-debug
+        container_name: php-fpm7.4-xdebug
         volumes:
             - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
 
@@ -159,15 +160,31 @@ services:
         container_name: php7.4-env
         volumes:
             - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
-            - /home/mpalamar/:/home/www-data
+            - ${HOME_PATH}:/home/www-data
 # php 7.4 end
-
+    node.loc:
+        build:
+            context: node
+            dockerfile: Dockerfile
+            args:
+                - GUEST_CODE_PATH=${GUEST_CODE_PATH}
+                - USER_ID=${USER_ID}
+                - GROUP_ID=${GROUP_ID}
+                - HOST_IP=${HOST_IP}
+                - DEBUG_IP=${DEBUG_IP}
+        container_name: node
+        volumes:
+            - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
+            - ${HOME_PATH}:/home/www-data
     mysql.loc:
         build:
             context: mysql 
             dockerfile: Dockerfile
         container_name: m2-mysql
-        command: --default-authentication-plugin=mysql_native_password
+        command: 
+            - --default-authentication-plugin=mysql_native_password
+            - --sort_buffer_size=1G
+            - --innodb-buffer-pool-size=1G
         volumes:
             - mysql-data:/var/lib/mysql
         environment:
@@ -176,7 +193,7 @@ services:
             #MYSQL_PASSWORD: magento
             #MYSQL_DATABASE: magento
         ports:
-            - "3306:3306"
+            - "127.0.0.1:3306:3306"
 
     redis.loc:
         build:
@@ -242,8 +259,10 @@ services:
         container_name: phpstorm
         volumes:
             - ${HOST_CODE_PATH}:${GUEST_CODE_PATH}
-            - /home/mpalamar/:/home/www-data
+            - ${HOME_PATH}:/home/www-data
             - phpstorm-config:/var/www
+            - ./phpstorm/phpstorm64.vmoptions:/opt/phpstorm/bin/phpstorm64.vmoptions
+ #           - /tmp/.X11-unix:/tmp/.X11-unix 
         environment:
             DISPLAY: ${HOST_IP}:0.0
     

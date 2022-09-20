@@ -23,7 +23,10 @@ RUN apk add --no-cache  unzip \
     openssh-client \
     bash \
     mysql-client \
-    patch
+    patch \
+    coreutils \
+    ca-certificates \ 
+    openssl 
 RUN apk --no-cache add sudo    
 RUN usermod -aG wheel www-data
 RUN echo "www-data ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
