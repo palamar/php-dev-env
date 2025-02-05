@@ -1,4 +1,4 @@
-FROM palamar/mx-php-fpm:8.1
+FROM palamar/mx-php-fpm:8.2-xdebug
 ARG USER_ID
 ARG GROUP_ID
 ARG HOST_IP
@@ -13,7 +13,21 @@ COPY ./conf.d/* /usr/local/etc/php/conf.d/
 COPY ./php-fpm.d/* /usr/local/etc/php-fpm.d/
 RUN sed -i "s#\${HOST_IP}#${HOST_IP}#g" /usr/local/etc/php/conf.d/*
 RUN sed -i "s#\${DEBUG_IP}#${DEBUG_IP}#g" /usr/local/etc/php/conf.d/*
+COPY files/.my.cnf ${GUEST_CODE_PATH}
+RUN apk update --no-cache
+RUN apk add --no-cache  unzip \
+    vim \
+    net-tools \
+    git \
+    htop \
+    openssh-client \
+    bash \
+    mysql-client \
+    patch
+RUN apk --no-cache add sudo    
+RUN usermod -aG wheel www-data
+RUN echo "www-data ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 USER www-data
-EXPOSE 9000
 WORKDIR ${GUEST_CODE_PATH}
+EXPOSE 9000
 CMD ["php-fpm", "-R"]

@@ -1,4 +1,4 @@
-FROM palamar/mx-php-fpm:8.1
+FROM palamar/mx-php-fpm:8.3
 ARG USER_ID
 ARG GROUP_ID
 ARG HOST_IP
